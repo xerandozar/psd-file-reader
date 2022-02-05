@@ -34,6 +34,7 @@ namespace PsdFileReader.Photoshop
         public int Width { get; private set; }
         public int Height { get; private set; }
 
+        public IEnumerable<Channel> Channels => m_Channels;
         private List<Channel> m_Channels;
         private bool m_ImageDataLoaded;
 
@@ -46,7 +47,7 @@ namespace PsdFileReader.Photoshop
 
         public string Name { get; private set; }
 
-        public Layer(int version, List<ChannelUpdate> channelUpdates, BigEndianReader reader)
+        public Layer(int version, BigEndianReader reader)
         {
             int top = reader.ReadInt32();
             int left = reader.ReadInt32();
@@ -66,7 +67,6 @@ namespace PsdFileReader.Photoshop
             for (int i = 0; i < channelCount; i++)
             {
                 var channel = new Channel(version, reader);
-                channelUpdates.Add(channel.UpdateImageDataPositions);
                 m_Channels.Add(channel);
             }
 

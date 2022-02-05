@@ -29,8 +29,6 @@ using System.Linq;
 
 namespace PsdFileReader.Photoshop
 {
-    public delegate void ChannelUpdate(BigEndianReader reader);
-
     public enum PsdColorMode : short
     {
         Bitmap = 0,
@@ -150,17 +148,17 @@ namespace PsdFileReader.Photoshop
             if (layerCount == 0)
                 return;
 
-            var channelUpdates = new List<ChannelUpdate>();
-
             for (int i = 0; i < layerCount; i++)
             {
-                var layer = new Layer(Version, channelUpdates, reader);
+                var layer = new Layer(Version, reader);
                 m_Layers.Add(layer);
             }
 
-            // Channels image data positions are defined after layers
-            foreach (var channelUpdate in channelUpdates)
-                channelUpdate(reader);
+            foreach (var layer in m_Layers)
+            {
+                foreach (var channel in layer.Channels)
+                    channel.UpdateImageDataPositions(reader);
+            }
 
             reader.Position = layerInfoEnd;
         }
